@@ -1,21 +1,16 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import CustomForm from "@components/Form";
 
 const EditPrompt = () => {
   const router = useRouter();
-
   const searchParams = useSearchParams();
-  const promptId = searchParams.get("id");
+  const promptId = searchParams ? searchParams.get("id") : null;
 
   const [submitting, setSubmitting] = useState(false);
-  const [post, setPost] = useState({
-    prompt: "",
-    tag: "",
-  });
+  const [post, setPost] = useState({ prompt: "", tag: "" });
 
   const updatePrompt = async (e) => {
     e.preventDefault();
@@ -42,11 +37,10 @@ const EditPrompt = () => {
       if (response.ok) {
         router.push("/");
       } else {
-        const errorData = await response.json();
-        console.log("Error updating prompt:", errorData);
+        console.error("Failed to update prompt:", await response.text());
       }
     } catch (error) {
-      console.log("Network error updating prompt:", error);
+      console.error("Network error updating prompt:", error);
     } finally {
       setSubmitting(false);
     }
@@ -67,7 +61,9 @@ const EditPrompt = () => {
       }
     };
 
-    if (promptId) getPromptDetails();
+    if (promptId) {
+      getPromptDetails();
+    }
   }, [promptId]);
 
   return (
